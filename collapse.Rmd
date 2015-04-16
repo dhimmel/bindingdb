@@ -12,6 +12,8 @@ library(ggplot2)
 library(DT)
 library(scales)
 
+options(stringsAsFactors=FALSE)
+
 write.delim <- function(x, file, sep='\t', quote = FALSE, row.names=FALSE, na = '', ...) {
   write.table(x = x, file = file, sep=sep, quote=quote, row.names=row.names, na=na, ...)
 }
@@ -24,7 +26,7 @@ binding.db <- file.path('data', 'binding.tsv.gz') %>%
   dplyr::filter(organism == 'Homo sapiens')
 
 # View a subset of the data.frame
-binding.db %>% dplyr::sample_n(200) %>% DT::datatable()
+binding.db %>% dplyr::sample_n(200) %>% dplyr::select(-c(pubmed, doi)) %>% DT::datatable()
 ```
 
 
