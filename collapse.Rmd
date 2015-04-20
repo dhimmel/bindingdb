@@ -57,7 +57,7 @@ ResolveAffinity <- function(df) {
       values <- df$affinity_nM[measures == measure]
       return.df <- data.frame(
         measure = measure,
-        affinity_nM = geom.mean(values),
+        affinity_nM = round(geom.mean(values), 5),
         n_measures = length(values))
       return(return.df)
     }
@@ -80,18 +80,33 @@ collapse.df %>% dplyr::sample_n(200) %>% DT::datatable()
 `r nrow(collapse.df)` compound--protein pairs were assayed.
 
 ```{r}
+drugbank.df <- 'http://git.dhimmel.com/drugbank/data/drugbank.tsv' %>%
+  read.delim() %>%
+  dplyr::mutate(drugbank_approved = as.integer(grepl('approved', groups))) %>%
+  dplyr::transmute(drugbank_id, drugbank_name = name, drugbank_approved)  
+
+entrez.df <- 'http://git.dhimmel.com/entrez-gene/data/symbols-human.tsv' %>%
+  read.delim() %>%
+  dplyr::transmute(entrez_gene = GeneID, gene_symbol = Symbol)
+
 gene.df <- collapse.df %>%
   dplyr::group_by(drugbank_id, entrez_gene) %>%
   dplyr::summarize(
     affinity_nM = min(affinity_nM),
     n_pairs = n()) %>%
-  dplyr::ungroup()
+  dplyr::ungroup() %>%
+  dplyr::left_join(drugbank.df) %>%
+  dplyr::left_join(entrez.df)
 
 gene.df %>%
   write.delim('data/bindings-drugbank-gene.tsv')
 
-# View a subset of the data.frame
-gene.df %>% dplyr::sample_n(200) %>% DT::datatable()
+# View bindings for approved drugs
+gene.df %>%
+  dplyr::filter(affinity_nM <= 1000) %>%
+  dplyr::filter(drugbank_approved == 1) %>%
+  dplyr::select(drugbank_name, gene_symbol, affinity_nM, n_pairs) %>%
+  DT::datatable()
 ```
 
 `r nrow(gene.df)` drugbank--gene pairs have measured binding affinities.
