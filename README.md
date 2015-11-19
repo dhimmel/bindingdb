@@ -1,5 +1,7 @@
 # Processing BindingDB
 
+[![DOI](https://zenodo.org/badge/14475/dhimmel/bindingdb.svg)](https://zenodo.org/badge/latestdoi/14475/dhimmel/bindingdb)
+
 This repository contains our processing of [BindingDB](https://www.bindingdb.org/bind/index.jsp). Refer to the corresponding [Thinklab discussion](https://doi.org/10.15363/thinklab.d53) for more information.
 
 ## License
